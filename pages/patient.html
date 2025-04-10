@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>医生AI助手 - 患者管理</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        body {
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background-color: #f3f4f6;
+        }
+        
+        .sidebar {
+            background-color: #1e40af;
+            color: white;
+            width: 250px;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 10;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar-collapsed {
+            width: 70px;
+        }
+        
+        .main-content {
+            margin-left: 250px;
+            transition: all 0.3s ease;
+        }
+        
+        .main-content-expanded {
+            margin-left: 70px;
+        }
+        
+        .nav-item {
+            border-left: 4px solid transparent;
+            transition: all 0.2s ease;
+        }
+        
+        .nav-item:hover, .nav-item.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-left-color: white;
+        }
+        
+        .patient-card {
+            transition: all 0.3s ease;
+        }
+        
+        .patient-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .tag {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- 侧边导航栏 -->
+    <div class="sidebar">
+        <div class="p-4 flex items-center justify-between border-b border-blue-800">
+            <div class="flex items-center space-x-3">
+                <i class="fas fa-stethoscope text-2xl"></i>
+                <span class="text-xl font-bold">医生AI助手</span>
+            </div>
+            <button id="toggle-sidebar" class="text-white focus:outline-none">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        
+        <nav class="mt-6">
+            <div class="px-4 py-2 text-xs text-blue-300 uppercase">
+                主导航
+            </div>
+            
+            <a href="dashboard.html" class="nav-item flex items-center px-4 py-3 text-white">
+                <i class="fas fa-th-large w-6"></i>
+                <span class="ml-3">工作台</span>
+            </a>
+            
+            <a href="patient.html" class="nav-item active flex items-center px-4 py-3 text-white">
+                <i class="fas fa-user-injured w-6"></i>
+                <span class="ml-3">患者管理</span>
+            </a>
+            
+            <a href="diagnosis.html" class="nav-item flex items-center px-4 py-3 text-white">
+                <i class="fas fa-brain w-6"></i>
+                <span class="ml-3">AI诊断</span>
+            </a>
+            
+            <a href="#" class="nav-item flex items-center px-4 py-3 text-white">
+                <i class="fas fa-file-medical-alt w-6"></i>
+                <span class="ml-3">诊断历史</span>
+            </a>
+            
+            <div class="px-4 py-2 mt-6 text-xs text-blue-300 uppercase">
+                系统
+            </div>
+            
+            <a href="settings.html" class="nav-item flex items-center px-4 py-3 text-white">
+                <i class="fas fa-cog w-6"></i>
+                <span class="ml-3">设置</span>
+            </a>
+            
+            <a href="#" class="nav-item flex items-center px-4 py-3 text-white">
+                <i class="fas fa-question-circle w-6"></i>
+                <span class="ml-3">帮助</span>
+            </a>
+        </nav>
+    </div>
+    
+    <!-- 主内容区域 -->
+    <div class="main-content min-h-screen">
+        <!-- 顶部导航栏 -->
+        <header class="bg-white shadow-sm">
+            <div class="flex justify-between items-center px-6 py-3">
+                <div class="flex items-center">
+                    <h1 class="text-xl font-semibold text-gray-800">患者管理</h1>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <button class="rounded-full bg-gray-100 p-2 focus:outline-none">
+                        <i class="fas fa-bell text-gray-600"></i>
+                    </button>
+                    
+                    <div class="flex items-center space-x-2">
+                        <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white">
+                            <span>张</span>
+                        </div>
+                        <div>
+                            <div class="text-sm font-medium text-gray-700">张医生</div>
+                            <div class="text-xs text-gray-500">呼吸内科</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <!-- 页面内容 -->
+        <main class="p-6">
+            <!-- 搜索和过滤器 -->
+            <div class="bg-white rounded-lg shadow-sm p-4 mb-6">
+                <div class="flex flex-wrap items-center">
+                    <div class="w-full md:w-1/3 lg:w-1/4 px-2 mb-4 md:mb-0">
+                        <div class="relative">
+                            <input type="text" placeholder="搜索患者..." class="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <div class="absolute left-3 top-2.5">
+                                <i class="fas fa-search text-gray-400"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="w-full md:w-1/3 lg:w-1/4 px-2 mb-4 md:mb-0">
+                        <select class="w-full py-2 px-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="">所有科室</option>
+                            <option value="respiratory">呼吸内科</option>
+                            <option value="cardiology">心内科</option>
+                            <option value="neurology">神经内科</option>
+                            <option value="gastroenterology">消化内科</option>
+                        </select>
+                    </div>
+                    
+                    <div class="w-full md:w-1/3 lg:w-1/4 px-2 mb-4 md:mb-0">
+                        <select class="w-full py-2 px-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="">诊断状态</option>
+                            <option value="completed">已完成</option>
+                            <option value="in_progress">进行中</option>
+                            <option value="not_started">未开始</option>
+                        </select>
+                    </div>
+                    
+                    <div class="w-full md:w-auto px-2">
+                        <button class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg flex items-center">
+                            <i class="fas fa-filter mr-2"></i>
+                            应用筛选
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 操作按钮 -->
+            <div class="flex justify-between items-center mb-6">
+                <div class="flex space-x-2">
+                    <button class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg flex items-center">
+                        <i class="fas fa-user-plus mr-2"></i>
+                        新增患者
+                    </button>
+                    
+                    <button class="bg-white hover:bg-gray-50 text-gray-700 font-medium py-2 px-4 rounded-lg border border-gray-300 flex items-center">
+                        <i class="fas fa-file-export mr-2"></i>
+                        导出
+                    </button>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <span class="text-sm text-gray-500">排序方式:</span>
+                    <select class="py-1.5 px-3 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="recent">最近就诊</option>
+                        <option value="name">姓名</option>
+                        <option value="age">年龄</option>
+                    </select>
+                    <div class="flex space-x-2">
+                        <button class="bg-white p-2 rounded border border-gray-300 hover:bg-gray-50 active:bg-gray-100">
+                            <i class="fas fa-th-large text-gray-600"></i>
+                        </button>
+                        <button class="bg-white p-2 rounded border border-gray-300 hover:bg-gray-50 active:bg-gray-100">
+                            <i class="fas fa-list text-gray-600"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 患者列表 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- 张菊仁 -->
+                <div class="patient-card bg-white rounded-lg shadow overflow-hidden">
+                    <div class="p-4 border-b border-gray-200">
+                        <div class="flex justify-between items-start">
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-semibold text-lg">
+                                    张
+                                </div>
+                                <div class="ml-3">
+                                    <h3 class="text-lg font-semibold text-gray-800">张菊仁</h3>
+                                    <p class="text-sm text-gray-500">女 · 68岁 · 呼吸内科</p>
+                                </div>
+                            </div>
+                            <div class="flex space-x-1">
+                                <button class="text-gray-500 hover:text-gray-700 p-1">
+                                    <i class="fas fa-star"></i>
+                                </button>
+                                <button class="text-gray-500 hover:text-gray-700 p-1">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="p-4">
+                        <div class="mb-3">
+                            <div class="text-sm font-medium text-gray-700 mb-1">基础疾病</div>
+                            <span class="tag bg-blue-100 text-blue-800">COPD</span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="text-sm font-medium text-gray-700 mb-1">主要症状</div>
+                            <span class="tag bg-yellow-100 text-yellow-800">咳嗽</span>
+                            <span class="tag bg-yellow-100 text-yellow-800">咳痰</span>
+                            <span class="tag bg-yellow-100 text-yellow-800">咽痛</span>
+                            <span class="tag bg-yellow-100 text-yellow-800">气短</span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="text-sm font-medium text-gray-700 mb-1">当前用药</div>
+                            <span class="tag bg-green-100 text-green-800">布地奈德福莫特罗</span>
+                        </div>
+                        
+                        <div class="flex justify-between items-center text-sm text-gray-500">
+                            <span>最近就诊: 2025-04-10</span>
+                            <span class="px-2 py-1 rounded-full bg-green-100 text-green-800 text-xs font-medium">
+                                已完成诊断
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-50 p-4 flex justify-between">
+                        <button class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                            <i class="fas fa-file-medical mr-1"></i>
+                            查看档案
+                        </button>
+                        <button class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-1.5 px-3 rounded">
+                            <i class="fas fa-brain mr-1"></i>
+                            AI诊断
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 王明辉 -->
+                <div class="patient-card bg-white rounded-lg shadow overflow-hidden">
+                    <div class="p-4 border-b border-gray-200">
+                        <div class="flex justify-between items-start">
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-green-600 font-semibold text-lg">
+                                    王
+                                </div>
+                                <div class="ml-3">
+                                    <h3 class="text-lg font-semibold text-gray-800">王明辉</h3>
+                                    <p class="text-sm text-gray-500">男 · 45岁 · 心内科</p>
+                                </div>
+                            </div>
+                            <div class="flex space-x-1">
+                                <button class="text-gray-500 hover:text-gray-700 p-1">
+                                    <i class="fas fa-star"></i>
+                                </button>
+                                <button class="text-gray-500 hover:text-gray-700 p-1">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="p-4">
+                        <div class="mb-3">
+                            <div class="text-sm font-medium text-gray-700 mb-1">基础疾病</div>
+                            <span class="tag bg-blue-100 text-blue-800">高血压</span>
+                            <span class="tag bg-blue-100 text-blue-800">冠心病</span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="text-sm font-medium text-gray-700 mb-1">主要症状</div>
+                            <span class="tag bg-red-100 text-red-800">胸痛</span>
+                            <span class="tag bg-red-100 text-red-800">气短</span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="text-sm font-medium text-gray-700 mb-1">当前用药</div>
+                            <span class="tag bg-green-100 text-green-800">硝酸甘油</span>
+                            <span class="tag bg-green-100 text-green-800">阿司匹林</span>
+                        </div>
+                        
+                        <div class="flex justify-between items-center text-sm text-gray-500">
+                            <span>最近就诊: 2025-04-10</span>
+                            <span class="px-2 py-1 rounded-full bg-yellow-100 text-yellow-800 text-xs font-medium">
+                                诊断进行中
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-50 p-4 flex justify-between">
+                        <button class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                            <i class="fas fa-file-medical mr-1"></i>
+                            查看档案
+                        </button>
+                        <button class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-1.5 px-3 rounded">
+                            <i class="fas fa-brain mr-1"></i>
+                            继续诊断
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 李淑芳 -->
+                <div class="patient-card bg-white rounded-lg shadow overflow-hidden">
+                    <div class="p-4 border-b border-gray-200">
+                        <div class="flex justify-between items-start">
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 font-semibold text-lg">
+                                    李
+                                </div>
+                                <div class="ml-3">
+                                    <h3 class="text-lg font-semibold text-gray-800">李淑芳</h3>
+                                    <p class="text-sm text-gray-500">女 · 52岁 · 神经内科</p>
+                                </div>
+                            </div>
+                            <div class="flex space-x-1">
+                                <button class="text-gray-500 hover:text-gray-700 p-1">
+                                    <i class="fas fa-star"></i>
+                                </button>
+                                <button class="text-gray-500 hover:text-gray-700 p-1">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="p-4">
+                        <div class="mb-3">
+                            <div class="text-sm font-medium text-gray-700 mb-1">基础疾病</div>
+                            <span class="tag bg-blue-100 text-blue-800">偏头痛</span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="text-sm font-medium text-gray-700 mb-1">主要症状</div>
+                            <span class="tag bg-blue-100 text-blue-800">头痛</span>
+                            <span class="tag bg-blue-100 text-blue-800">头晕</span>
+                            <span class="tag bg-blue-100 text-blue-800">恶心</span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="text-sm font-medium text-gray-700 mb-1">当前用药</div>
+                            <span class="tag bg-green-100 text-green-800">舒马曲坦</span>
+                        </div>
+                        
+                        <div class="flex justify-between items-center text-sm text-gray-500">
+                            <span>最近就诊: 2025-04-09</span>
+                            <span class="px-2 py-1 rounded-full bg-gray-100 text-gray-800 text-xs font-medium">
+                                未开始诊断
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-50 p-4 flex justify-between">
+                        <button class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                            <i class="fas fa-file-medical mr-1"></i>
+                            查看档案
+                        </button>
+                        <button class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-1.5 px-3 rounded">
+                            <i class="fas fa-brain mr-1"></i>
+                            开始诊断
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 更多患者卡片 -->
+                <div class="patient-card bg-white rounded-lg shadow overflow-hidden">
+                    <div class="p-4 border-b border-gray-200">
+                        <div class="flex justify-between items-start">
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center text-red-600 font-semibold text-lg">
+                                    刘
+                                </div>
+                                <div class="ml-3">
+                                    <h3 class="text-lg font-semibold text-gray-800">刘建国</h3>
+                                    <p class="text-sm text-gray-500">男 · 62岁 · 内分泌科</p>
+                                </div>
+                            </div>
+                            <div class="flex space-x-1">
+                                <button class="text-gray-500 hover:text-gray-700 p-1">
+                                    <i class="fas fa-star"></i>
+                                </button>
+                                <button class="text-gray-500 hover:text-gray-700 p-1">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="p-4">
+                        <div class="mb-3">
+                            <div class="text-sm font-medium text-gray-700 mb-1">基础疾病</div>
+                            <span class="tag bg-blue-100 text-blue-800">糖尿病</span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="text-sm font-medium text-gray-700 mb-1">主要症状</div>
+                            <span class="tag bg-red-100 text-red-800">口渴</span>
+                            <span class="tag bg-red-100 text-red-800">体重下降</span>
+                            <span class="tag bg-red-100 text-red-800">疲劳</span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="text-sm font-medium text-gray-700 mb-1">当前用药</div>
+                            <span class="tag bg-green-100 text-green-800">胰岛素</span>
+                            <span class="tag bg-green-100 text-green-800">二甲双胍</span>
+                        </div>
+                        
+                        <div class="flex justify-between items-center text-sm text-gray-500">
+                            <span>最近就诊: 2025-04-08</span>
+                            <span class="px-2 py-1 rounded-full bg-green-100 text-green-800 text-xs font-medium">
+                                已完成诊断
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-50 p-4 flex justify-between">
+                        <button class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                            <i class="fas fa-file-medical mr-1"></i>
+                            查看档案
+                        </button>
+                        <button class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-1.5 px-3 rounded">
+                            <i class="fas fa-brain mr-1"></i>
+                            AI诊断
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 分页 -->
+            <div class="mt-8 flex justify-between items-center">
+                <div class="text-sm text-gray-500">
+                    显示 1-4 共 42 位患者
+                </div>
+                
+                <div class="flex space-x-1">
+                    <button class="px-3 py-1 rounded border border-gray-300 text-gray-500 hover:bg-gray-50 disabled:opacity-50" disabled>
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="px-3 py-1 rounded border border-gray-300 bg-blue-600 text-white hover:bg-blue-700">
+                        1
+                    </button>
+                    <button class="px-3 py-1 rounded border border-gray-300 text-gray-700 hover:bg-gray-50">
+                        2
+                    </button>
+                    <button class="px-3 py-1 rounded border border-gray-300 text-gray-700 hover:bg-gray-50">
+                        3
+                    </button>
+                    <button class="px-3 py-1 rounded border border-gray-300 text-gray-700 hover:bg-gray-50">
+                        ...
+                    </button>
+                    <button class="px-3 py-1 rounded border border-gray-300 text-gray-700 hover:bg-gray-50">
+                        11
+                    </button>
+                    <button class="px-3 py-1 rounded border border-gray-300 text-gray-500 hover:bg-gray-50">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggleButton = document.getElementById('toggle-sidebar');
+            const sidebar = document.querySelector('.sidebar');
+            const mainContent = document.querySelector('.main-content');
+            
+            toggleButton.addEventListener('click', function() {
+                sidebar.classList.toggle('sidebar-collapsed');
+                mainContent.classList.toggle('main-content-expanded');
+                
+                // 隐藏或显示文本元素
+                const textElements = sidebar.querySelectorAll('span:not(.fa)');
+                textElements.forEach(el => {
+                    el.classList.toggle('hidden');
+                });
+            });
+        });
+    </script>
+</body>
+</html> 

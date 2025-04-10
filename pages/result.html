@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>医生AI助手 - 诊断结果</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        body {
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background-color: #f3f4f6;
+        }
+        
+        .sidebar {
+            background-color: #1e40af;
+            color: white;
+            width: 250px;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 10;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar-collapsed {
+            width: 70px;
+        }
+        
+        .main-content {
+            margin-left: 250px;
+            transition: all 0.3s ease;
+        }
+        
+        .main-content-expanded {
+            margin-left: 70px;
+        }
+        
+        .nav-item {
+            border-left: 4px solid transparent;
+            transition: all 0.2s ease;
+        }
+        
+        .nav-item:hover, .nav-item.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-left-color: white;
+        }
+        
+        .result-card {
+            background-color: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .section-title {
+            color: #1e40af;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-title i {
+            margin-right: 0.5rem;
+        }
+        
+        .diagnosis-item {
+            position: relative;
+            padding-left: 1.5rem;
+        }
+        
+        .diagnosis-item:before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0.5rem;
+            width: 0.5rem;
+            height: 0.5rem;
+            background-color: #3b82f6;
+            border-radius: 50%;
+        }
+        
+        .print-header, .print-footer {
+            display: none;
+        }
+        
+        @media print {
+            .sidebar, .main-header, .actions-bar {
+                display: none;
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding: 0;
+            }
+            
+            .result-card {
+                box-shadow: none;
+                border: none;
+            }
+            
+            .print-header, .print-footer {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 侧边导航栏 -->
+    <div class="sidebar">
+        <div class="p-4 flex items-center justify-between border-b border-blue-800">
+            <div class="flex items-center space-x-3">
+                <i class="fas fa-stethoscope text-2xl"></i>
+                <span class="text-xl font-bold">医生AI助手</span>
+            </div>
+            <button id="toggle-sidebar" class="text-white focus:outline-none">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        
+        <nav class="mt-6">
+            <div class="px-4 py-2 text-xs text-blue-300 uppercase">
+                主导航
+            </div>
+            
+            <a href="dashboard.html" class="nav-item flex items-center px-4 py-3 text-white">
+                <i class="fas fa-th-large w-6"></i>
+                <span class="ml-3">工作台</span>
+            </a>
+            
+            <a href="patient.html" class="nav-item flex items-center px-4 py-3 text-white">
+                <i class="fas fa-user-injured w-6"></i>
+                <span class="ml-3">患者管理</span>
+            </a>
+            
+            <a href="diagnosis.html" class="nav-item flex items-center px-4 py-3 text-white">
+                <i class="fas fa-brain w-6"></i>
+                <span class="ml-3">AI诊断</span>
+            </a>
+            
+            <a href="#" class="nav-item active flex items-center px-4 py-3 text-white">
+                <i class="fas fa-file-medical-alt w-6"></i>
+                <span class="ml-3">诊断结果</span>
+            </a>
+            
+            <div class="px-4 py-2 mt-6 text-xs text-blue-300 uppercase">
+                系统
+            </div>
+            
+            <a href="settings.html" class="nav-item flex items-center px-4 py-3 text-white">
+                <i class="fas fa-cog w-6"></i>
+                <span class="ml-3">设置</span>
+            </a>
+            
+            <a href="#" class="nav-item flex items-center px-4 py-3 text-white">
+                <i class="fas fa-question-circle w-6"></i>
+                <span class="ml-3">帮助</span>
+            </a>
+        </nav>
+    </div>
+    
+    <!-- 主内容区域 -->
+    <div class="main-content min-h-screen">
+        <!-- 顶部导航栏 -->
+        <header class="main-header bg-white shadow-sm">
+            <div class="flex justify-between items-center px-6 py-3">
+                <div class="flex items-center">
+                    <h1 class="text-xl font-semibold text-gray-800">诊断结果</h1>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <button class="rounded-full bg-gray-100 p-2 focus:outline-none">
+                        <i class="fas fa-bell text-gray-600"></i>
+                    </button>
+                    
+                    <div class="flex items-center space-x-2">
+                        <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white">
+                            <span>张</span>
+                        </div>
+                        <div>
+                            <div class="text-sm font-medium text-gray-700">张医生</div>
+                            <div class="text-xs text-gray-500">呼吸内科</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <!-- 页面内容 -->
+        <main class="p-6">
+            <!-- 打印专用页眉 -->
+            <div class="print-header mb-6">
+                <div class="flex justify-between items-center border-b border-gray-300 pb-4">
+                    <div class="flex items-center">
+                        <img src="../img/hospital-logo.png" alt="医院标志" class="h-12 mr-3">
+                        <div>
+                            <h1 class="font-bold text-xl">某某医院</h1>
+                            <p class="text-sm text-gray-500">AI辅助诊断报告</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm">报告ID: DR-2025041001</p>
+                        <p class="text-sm">生成日期: 2025-04-10</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 操作栏 -->
+            <div class="actions-bar flex justify-between items-center mb-6">
+                <div class="flex items-center">
+                    <button class="bg-white rounded-lg shadow px-4 py-2 mr-3 flex items-center text-sm font-medium">
+                        <i class="fas fa-arrow-left mr-2 text-gray-500"></i>
+                        返回患者档案
+                    </button>
+                    <span class="text-gray-500">报告ID: DR-2025041001</span>
+                </div>
+                
+                <div class="flex space-x-2">
+                    <button class="bg-white hover:bg-gray-50 rounded-lg shadow px-4 py-2 flex items-center text-sm font-medium">
+                        <i class="fas fa-download mr-2 text-blue-600"></i>
+                        下载PDF
+                    </button>
+                    <button id="print-btn" class="bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow px-4 py-2 flex items-center text-sm font-medium">
+                        <i class="fas fa-print mr-2"></i>
+                        打印报告
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 诊断结果卡片 -->
+            <div class="result-card p-8" id="printable-area">
+                <!-- 患者基本信息 -->
+                <div class="mb-8 pb-6 border-b border-gray-200">
+                    <div class="flex justify-between">
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-800 mb-4">AI辅助诊断报告</h2>
+                            <div class="grid grid-cols-2 gap-y-2 gap-x-4 text-sm">
+                                <div>
+                                    <span class="text-gray-500">患者姓名:</span>
+                                    <span class="font-medium">张菊仁</span>
+                                </div>
+                                <div>
+                                    <span class="text-gray-500">性别/年龄:</span>
+                                    <span class="font-medium">女 / 68岁</span>
+                                </div>
+                                <div>
+                                    <span class="text-gray-500">门诊号:</span>
+                                    <span class="font-medium">20250410-001</span>
+                                </div>
+                                <div>
+                                    <span class="text-gray-500">就诊科室:</span>
+                                    <span class="font-medium">呼吸内科</span>
+                                </div>
+                                <div>
+                                    <span class="text-gray-500">基础疾病:</span>
+                                    <span class="font-medium">COPD (慢性阻塞性肺病)</span>
+                                </div>
+                                <div>
+                                    <span class="text-gray-500">当前用药:</span>
+                                    <span class="font-medium">布地奈德福莫特罗吸入剂</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="text-right">
+                            <div class="text-sm mb-2">
+                                <span class="text-gray-500">诊断医生:</span>
+                                <span class="font-medium">张医生</span>
+                            </div>
+                            <div class="text-sm mb-2">
+                                <span class="text-gray-500">诊断日期:</span>
+                                <span class="font-medium">2025-04-10</span>
+                            </div>
+                            <div class="text-sm">
+                                <span class="text-gray-500">报告生成时间:</span>
+                                <span class="font-medium">14:30:22</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 症状分析 -->
+                <div class="mb-8">
+                    <h3 class="section-title text-xl mb-4">
+                        <i class="fas fa-file-medical"></i>
+                        症状分析
+                    </h3>
+                    <div class="bg-gray-50 p-5 rounded-lg">
+                        <div class="mb-3">
+                            <div class="font-medium text-gray-800 mb-1">主要症状：</div>
+                            <p>咳嗽、咳痰、咽痛4天伴咽干、流涕、气短</p>
+                        </div>
+                        <div class="mb-3">
+                            <div class="font-medium text-gray-800 mb-1">症状特点：</div>
+                            <p>受凉后起病，无发热等全身症状</p>
+                        </div>
+                        <div>
+                            <div class="font-medium text-gray-800 mb-1">基础疾病：</div>
+                            <p>COPD【慢性阻塞性肺病】病史2月规律使用布地奈德福莫特罗吸入剂</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 诊断评估 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <!-- 鉴别诊断 -->
+                    <div>
+                        <h3 class="section-title text-xl mb-4">
+                            <i class="fas fa-stethoscope"></i>
+                            鉴别诊断
+                        </h3>
+                        <div class="bg-gray-50 p-5 rounded-lg h-full">
+                            <p class="text-sm text-gray-500 mb-3">按可能性排序：</p>
+                            <ol class="list-decimal pl-5 space-y-2">
+                                <li class="font-medium">
+                                    急性上呼吸道感染（病毒性可能性大）
+                                    <div class="mt-1 text-sm text-gray-500">符合症状特点，无发热，呈现上呼吸道症状</div>
+                                </li>
+                                <li class="font-medium">
+                                    COPD急性加重
+                                    <div class="mt-1 text-sm text-gray-500">患者有COPD基础疾病，气短症状需警惕</div>
+                                </li>
+                                <li class="font-medium">
+                                    社区获得性肺炎（需排除）
+                                    <div class="mt-1 text-sm text-gray-500">虽无明显发热，但需通过影像学检查排除</div>
+                                </li>
+                                <li class="font-medium">
+                                    过敏性鼻炎/咽炎
+                                    <div class="mt-1 text-sm text-gray-500">季节更替，可能性相对较低</div>
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+                    
+                    <!-- 危险信号评估 -->
+                    <div>
+                        <h3 class="section-title text-xl mb-4">
+                            <i class="fas fa-exclamation-triangle text-yellow-600"></i>
+                            危险信号评估
+                        </h3>
+                        <div class="bg-red-50 p-5 rounded-lg h-full">
+                            <p class="text-sm text-red-700 mb-3">需立即就医的情况：</p>
+                            <ul class="space-y-3">
+                                <li class="flex items-start">
+                                    <i class="fas fa-exclamation-circle text-red-600 mr-2 mt-0.5"></i>
+                                    <div>
+                                        <div class="font-medium">气短加重或出现呼吸困难</div>
+                                        <div class="text-sm text-red-600 mt-0.5">COPD患者尤其需注意此症状</div>
+                                    </div>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-exclamation-circle text-red-600 mr-2 mt-0.5"></i>
+                                    <div>
+                                        <div class="font-medium">发热超过38.5℃</div>
+                                        <div class="text-sm text-red-600 mt-0.5">可能提示细菌感染或肺炎</div>
+                                    </div>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-exclamation-circle text-red-600 mr-2 mt-0.5"></i>
+                                    <div>
+                                        <div class="font-medium">痰量明显增多或出现脓痰、血痰</div>
+                                        <div class="text-sm text-red-600 mt-0.5">提示病情加重或并发症</div>
+                                    </div>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-exclamation-circle text-red-600 mr-2 mt-0.5"></i>
+                                    <div>
+                                        <div class="font-medium">意识改变或血氧饱和度下降</div>
+                                        <div class="text-sm text-red-600 mt-0.5">呼吸功能严重受损信号</div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 建议检查 -->
+                <div class="mb-8">
+                    <h3 class="section-title text-xl mb-4">
+                        <i class="fas fa-microscope"></i>
+                        建议检查
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-gray-50 p-5 rounded-lg">
+                            <h4 class="font-medium text-gray-800 mb-3 flex items-center">
+                                <i class="fas fa-check-circle text-green-600 mr-2"></i>
+                                必须检查
+                            </h4>
+                            <ul class="space-y-2">
+                                <li class="flex items-start">
+                                    <span class="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs mr-2 mt-0.5">1</span>
+                                    <div>
+                                        <div class="font-medium">血常规+C反应蛋白</div>
+                                        <div class="text-sm text-gray-500 mt-0.5">确定是否存在炎症反应及严重程度</div>
+                                    </div>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs mr-2 mt-0.5">2</span>
+                                    <div>
+                                        <div class="font-medium">胸部X线</div>
+                                        <div class="text-sm text-gray-500 mt-0.5">排除肺炎可能</div>
+                                    </div>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs mr-2 mt-0.5">3</span>
+                                    <div>
+                                        <div class="font-medium">指脉氧饱和度监测</div>
+                                        <div class="text-sm text-gray-500 mt-0.5">评估呼吸功能状态</div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <div class="bg-gray-50 p-5 rounded-lg">
+                            <h4 class="font-medium text-gray-800 mb-3 flex items-center">
+                                <i class="fas fa-clipboard-list text-blue-600 mr-2"></i>
+                                可选检查
+                            </h4>
+                            <ul class="space-y-2">
+                                <li class="flex items-start">
+                                    <span class="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs mr-2 mt-0.5">1</span>
+                                    <div>
+                                        <div class="font-medium">肺功能检查</div>
+                                        <div class="text-sm text-gray-500 mt-0.5">评估COPD控制情况</div>
+                                    </div>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs mr-2 mt-0.5">2</span>
+                                    <div>
+                                        <div class="font-medium">痰培养</div>
+                                        <div class="text-sm text-gray-500 mt-0.5">如怀疑细菌感染则需进行</div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 诊疗建议 -->
+                <div class="mb-8">
+                    <h3 class="section-title text-xl mb-4">
+                        <i class="fas fa-notes-medical"></i>
+                        诊疗建议
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <div class="bg-gray-50 p-5 rounded-lg mb-4">
+                                <h4 class="font-medium text-gray-800 mb-3">一般处理</h4>
+                                <ul class="space-y-2">
+                                    <li class="diagnosis-item">适当增加水分摄入</li>
+                                    <li class="diagnosis-item">保持室内空气流通</li>
+                                    <li class="diagnosis-item">继续规律使用布地奈德福莫特罗吸入剂</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="bg-gray-50 p-5 rounded-lg">
+                                <h4 class="font-medium text-gray-800 mb-3">对症治疗</h4>
+                                <ul class="space-y-2">
+                                    <li class="diagnosis-item">可考虑使用祛痰药物（如氨溴索）</li>
+                                    <li class="diagnosis-item">咽痛可使用含片缓解症状</li>
+                                    <li class="diagnosis-item">不推荐常规使用抗生素（除非有细菌感染证据）</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="bg-gray-50 p-5 rounded-lg mb-4">
+                                <h4 class="font-medium text-gray-800 mb-3">随访建议</h4>
+                                <ul class="space-y-2">
+                                    <li class="diagnosis-item">如症状持续超过7天无改善或加重需复诊</li>
+                                    <li class="diagnosis-item">如出现上述危险信号，需立即就医</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="bg-gray-50 p-5 rounded-lg">
+                                <h4 class="font-medium text-gray-800 mb-3">就医建议</h4>
+                                <ul class="space-y-2">
+                                    <li class="diagnosis-item">建议尽快于呼吸内科门诊就诊</li>
+                                    <li class="diagnosis-item">就诊时请携带既往COPD诊断资料和用药记录</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 注意事项 -->
+                <div class="mb-6 p-5 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <h3 class="font-medium text-xl text-yellow-800 mb-3 flex items-center">
+                        <i class="fas fa-exclamation-circle mr-2"></i>
+                        注意事项
+                    </h3>
+                    <p class="text-yellow-700">由于患者有COPD基础疾病，即使症状看似轻微，也需警惕COPD急性加重的可能。建议密切观察病情变化。当前建议不能替代实际面诊，如有任何病情变化请及时就医。</p>
+                </div>
+                
+                <!-- AI辅助声明 -->
+                <div class="flex justify-between items-center text-sm text-gray-500 mt-10 pt-6 border-t border-gray-200">
+                    <div>
+                        <div class="mb-1">本报告由AI辅助生成，医生审核确认</div>
+                        <div>AI系统版本: v2.5.3</div>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="mr-4">
+                            <div>AI生成时间: 2025-04-10 14:30:22</div>
+                            <div>医生审核时间: 2025-04-10 14:35:10</div>
+                        </div>
+                        <div class="w-24 h-16 flex items-center justify-center border border-gray-300 rounded">
+                            <span class="text-blue-600 font-medium">医生签名</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 打印页脚 -->
+                <div class="print-footer mt-10 pt-4 border-t border-gray-300 text-sm text-gray-500 text-center">
+                    <p>某某医院 | 地址: XX市XX区XX路123号 | 电话: 123-4567-8900</p>
+                    <p>报告ID: DR-2025041001 | 第1页，共1页</p>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggleButton = document.getElementById('toggle-sidebar');
+            const sidebar = document.querySelector('.sidebar');
+            const mainContent = document.querySelector('.main-content');
+            
+            toggleButton.addEventListener('click', function() {
+                sidebar.classList.toggle('sidebar-collapsed');
+                mainContent.classList.toggle('main-content-expanded');
+                
+                // 隐藏或显示文本元素
+                const textElements = sidebar.querySelectorAll('span:not(.fa)');
+                textElements.forEach(el => {
+                    el.classList.toggle('hidden');
+                });
+            });
+            
+            // 打印按钮功能
+            const printBtn = document.getElementById('print-btn');
+            printBtn.addEventListener('click', function() {
+                window.print();
+            });
+        });
+    </script>
+</body>
+</html> 

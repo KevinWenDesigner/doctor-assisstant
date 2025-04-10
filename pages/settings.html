@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>医生AI助手 - 系统设置</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        body {
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background-color: #f3f4f6;
+        }
+        
+        .sidebar {
+            background-color: #1e40af;
+            color: white;
+            width: 250px;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 10;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar-collapsed {
+            width: 70px;
+        }
+        
+        .main-content {
+            margin-left: 250px;
+            transition: all 0.3s ease;
+        }
+        
+        .main-content-expanded {
+            margin-left: 70px;
+        }
+        
+        .nav-item {
+            border-left: 4px solid transparent;
+            transition: all 0.2s ease;
+        }
+        
+        .nav-item:hover, .nav-item.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-left-color: white;
+        }
+        
+        .settings-card {
+            background-color: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .tab {
+            padding: 0.75rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .tab:hover {
+            background-color: #f1f5f9;
+        }
+        
+        .tab.active {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 48px;
+            height: 24px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: #1e40af;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(24px);
+        }
+    </style>
+</head>
+<body>
+    <!-- 侧边导航栏 -->
+    <div class="sidebar">
+        <div class="p-4 flex items-center justify-between border-b border-blue-800">
+            <div class="flex items-center space-x-3">
+                <i class="fas fa-stethoscope text-2xl"></i>
+                <span class="text-xl font-bold">医生AI助手</span>
+            </div>
+            <button id="toggle-sidebar" class="text-white focus:outline-none">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        
+        <nav class="mt-6">
+            <div class="px-4 py-2 text-xs text-blue-300 uppercase">
+                主导航
+            </div>
+            
+            <a href="dashboard.html" class="nav-item flex items-center px-4 py-3 text-white">
+                <i class="fas fa-th-large w-6"></i>
+                <span class="ml-3">工作台</span>
+            </a>
+            
+            <a href="patient.html" class="nav-item flex items-center px-4 py-3 text-white">
+                <i class="fas fa-user-injured w-6"></i>
+                <span class="ml-3">患者管理</span>
+            </a>
+            
+            <a href="diagnosis.html" class="nav-item flex items-center px-4 py-3 text-white">
+                <i class="fas fa-brain w-6"></i>
+                <span class="ml-3">AI诊断</span>
+            </a>
+            
+            <a href="#" class="nav-item flex items-center px-4 py-3 text-white">
+                <i class="fas fa-file-medical-alt w-6"></i>
+                <span class="ml-3">诊断历史</span>
+            </a>
+            
+            <div class="px-4 py-2 mt-6 text-xs text-blue-300 uppercase">
+                系统
+            </div>
+            
+            <a href="settings.html" class="nav-item active flex items-center px-4 py-3 text-white">
+                <i class="fas fa-cog w-6"></i>
+                <span class="ml-3">设置</span>
+            </a>
+            
+            <a href="#" class="nav-item flex items-center px-4 py-3 text-white">
+                <i class="fas fa-question-circle w-6"></i>
+                <span class="ml-3">帮助</span>
+            </a>
+        </nav>
+    </div>
+    
+    <!-- 主内容区域 -->
+    <div class="main-content min-h-screen">
+        <!-- 顶部导航栏 -->
+        <header class="bg-white shadow-sm">
+            <div class="flex justify-between items-center px-6 py-3">
+                <div class="flex items-center">
+                    <h1 class="text-xl font-semibold text-gray-800">系统设置</h1>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <button class="rounded-full bg-gray-100 p-2 focus:outline-none">
+                        <i class="fas fa-bell text-gray-600"></i>
+                    </button>
+                    
+                    <div class="flex items-center space-x-2">
+                        <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white">
+                            <span>张</span>
+                        </div>
+                        <div>
+                            <div class="text-sm font-medium text-gray-700">张医生</div>
+                            <div class="text-xs text-gray-500">呼吸内科</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <!-- 页面内容 -->
+        <main class="p-6">
+            <div class="settings-card">
+                <div class="flex">
+                    <!-- 左侧选项卡 -->
+                    <div class="w-64 p-5 border-r border-gray-200">
+                        <div class="mb-6">
+                            <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">个人设置</h3>
+                            <ul class="space-y-1">
+                                <li>
+                                    <a href="#" class="tab active flex items-center">
+                                        <i class="fas fa-user mr-3 text-gray-500"></i>
+                                        个人资料
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" class="tab flex items-center">
+                                        <i class="fas fa-shield-alt mr-3 text-gray-500"></i>
+                                        账号安全
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" class="tab flex items-center">
+                                        <i class="fas fa-bell mr-3 text-gray-500"></i>
+                                        通知设置
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <div class="mb-6">
+                            <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">AI 设置</h3>
+                            <ul class="space-y-1">
+                                <li>
+                                    <a href="#" class="tab flex items-center">
+                                        <i class="fas fa-robot mr-3 text-gray-500"></i>
+                                        AI 偏好
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" class="tab flex items-center">
+                                        <i class="fas fa-chart-bar mr-3 text-gray-500"></i>
+                                        统计与分析
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" class="tab flex items-center">
+                                        <i class="fas fa-database mr-3 text-gray-500"></i>
+                                        数据管理
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <div>
+                            <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">系统</h3>
+                            <ul class="space-y-1">
+                                <li>
+                                    <a href="#" class="tab flex items-center">
+                                        <i class="fas fa-cogs mr-3 text-gray-500"></i>
+                                        系统设置
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" class="tab flex items-center">
+                                        <i class="fas fa-brush mr-3 text-gray-500"></i>
+                                        界面设置
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" class="tab flex items-center">
+                                        <i class="fas fa-plug mr-3 text-gray-500"></i>
+                                        插件与集成
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <!-- 右侧内容 -->
+                    <div class="flex-1 p-6">
+                        <div class="mb-6">
+                            <h2 class="text-xl font-semibold text-gray-800 mb-1">个人资料</h2>
+                            <p class="text-sm text-gray-500">管理您的个人信息和偏好设置</p>
+                        </div>
+                        
+                        <div class="mb-8">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-20 h-20 rounded-full bg-blue-600 flex items-center justify-center text-white text-2xl">
+                                    <span>张</span>
+                                </div>
+                                <div>
+                                    <div class="text-gray-700 font-medium">张医生</div>
+                                    <div class="text-gray-500 text-sm">呼吸内科</div>
+                                    <div class="mt-2">
+                                        <button class="text-blue-600 text-sm font-medium hover:text-blue-800">更换头像</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="border-t border-gray-200 pt-6">
+                            <form action="#" method="POST">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                    <div>
+                                        <label for="fullname" class="block text-sm font-medium text-gray-700 mb-1">姓名</label>
+                                        <input type="text" id="fullname" class="form-control" value="张医生">
+                                    </div>
+                                    
+                                    <div>
+                                        <label for="profession" class="block text-sm font-medium text-gray-700 mb-1">专业职称</label>
+                                        <input type="text" id="profession" class="form-control" value="主治医师">
+                                    </div>
+                                </div>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                    <div>
+                                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">电子邮箱</label>
+                                        <input type="email" id="email" class="form-control" value="doctor.zhang@hospital.com">
+                                    </div>
+                                    
+                                    <div>
+                                        <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">手机号码</label>
+                                        <input type="tel" id="phone" class="form-control" value="135****2468">
+                                    </div>
+                                </div>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                    <div>
+                                        <label for="department" class="block text-sm font-medium text-gray-700 mb-1">科室</label>
+                                        <select id="department" class="form-control">
+                                            <option value="respiratory">呼吸内科</option>
+                                            <option value="cardiology">心内科</option>
+                                            <option value="neurology">神经内科</option>
+                                            <option value="gastroenterology">消化内科</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div>
+                                        <label for="hospital" class="block text-sm font-medium text-gray-700 mb-1">医院</label>
+                                        <input type="text" id="hospital" class="form-control" value="某某医院">
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-6">
+                                    <label for="bio" class="block text-sm font-medium text-gray-700 mb-1">个人简介</label>
+                                    <textarea id="bio" rows="4" class="form-control">呼吸内科医生，主要擅长慢性阻塞性肺病（COPD）和哮喘等呼吸系统疾病的诊断和治疗。</textarea>
+                                </div>
+                                
+                                <div class="border-t border-gray-200 pt-6 mb-6">
+                                    <h3 class="text-lg font-medium text-gray-800 mb-4">通知设置</h3>
+                                    
+                                    <div class="space-y-4">
+                                        <div class="flex items-center justify-between">
+                                            <div>
+                                                <div class="font-medium text-gray-700">电子邮件通知</div>
+                                                <div class="text-sm text-gray-500">接收关于系统更新、患者和诊断相关的电子邮件</div>
+                                            </div>
+                                            <label class="toggle-switch">
+                                                <input type="checkbox" checked>
+                                                <span class="slider"></span>
+                                            </label>
+                                        </div>
+                                        
+                                        <div class="flex items-center justify-between">
+                                            <div>
+                                                <div class="font-medium text-gray-700">AI诊断完成提醒</div>
+                                                <div class="text-sm text-gray-500">当AI完成诊断分析时接收通知</div>
+                                            </div>
+                                            <label class="toggle-switch">
+                                                <input type="checkbox" checked>
+                                                <span class="slider"></span>
+                                            </label>
+                                        </div>
+                                        
+                                        <div class="flex items-center justify-between">
+                                            <div>
+                                                <div class="font-medium text-gray-700">患者预约提醒</div>
+                                                <div class="text-sm text-gray-500">接收关于新患者预约的通知</div>
+                                            </div>
+                                            <label class="toggle-switch">
+                                                <input type="checkbox">
+                                                <span class="slider"></span>
+                                            </label>
+                                        </div>
+                                        
+                                        <div class="flex items-center justify-between">
+                                            <div>
+                                                <div class="font-medium text-gray-700">系统更新通知</div>
+                                                <div class="text-sm text-gray-500">接收关于系统功能更新和维护的通知</div>
+                                            </div>
+                                            <label class="toggle-switch">
+                                                <input type="checkbox" checked>
+                                                <span class="slider"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="border-t border-gray-200 pt-6">
+                                    <h3 class="text-lg font-medium text-gray-800 mb-4">AI设置</h3>
+                                    
+                                    <div class="space-y-4">
+                                        <div class="flex items-center justify-between">
+                                            <div>
+                                                <div class="font-medium text-gray-700">自动生成AI诊断报告</div>
+                                                <div class="text-sm text-gray-500">系统将在收集到足够信息后自动生成诊断建议</div>
+                                            </div>
+                                            <label class="toggle-switch">
+                                                <input type="checkbox" checked>
+                                                <span class="slider"></span>
+                                            </label>
+                                        </div>
+                                        
+                                        <div class="flex items-center justify-between">
+                                            <div>
+                                                <div class="font-medium text-gray-700">数据共享与改进</div>
+                                                <div class="text-sm text-gray-500">允许分享匿名数据以改进AI模型</div>
+                                            </div>
+                                            <label class="toggle-switch">
+                                                <input type="checkbox" checked>
+                                                <span class="slider"></span>
+                                            </label>
+                                        </div>
+                                        
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-1">AI响应详细程度</label>
+                                            <select class="form-control">
+                                                <option>详细 - 提供全面分析和解释</option>
+                                                <option>标准 - 平衡详细程度和简洁性</option>
+                                                <option>简洁 - 仅提供关键诊断信息</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-1">专业术语偏好</label>
+                                            <select class="form-control">
+                                                <option>专业医学术语 - 适合医疗专业人员</option>
+                                                <option>平衡 - 专业术语搭配通俗解释</option>
+                                                <option>通俗易懂 - 减少专业术语使用</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-8 flex justify-end">
+                                    <button type="button" class="bg-white hover:bg-gray-50 text-gray-700 font-medium py-2 px-4 border border-gray-300 rounded-md shadow-sm mr-3">
+                                        取消
+                                    </button>
+                                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md shadow-sm">
+                                        保存更改
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggleButton = document.getElementById('toggle-sidebar');
+            const sidebar = document.querySelector('.sidebar');
+            const mainContent = document.querySelector('.main-content');
+            
+            toggleButton.addEventListener('click', function() {
+                sidebar.classList.toggle('sidebar-collapsed');
+                mainContent.classList.toggle('main-content-expanded');
+                
+                // 隐藏或显示文本元素
+                const textElements = sidebar.querySelectorAll('span:not(.fa)');
+                textElements.forEach(el => {
+                    el.classList.toggle('hidden');
+                });
+            });
+            
+            // 切换设置选项卡
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    // 移除所有active类
+                    tabs.forEach(t => t.classList.remove('active'));
+                    // 为当前点击的添加active类
+                    this.classList.add('active');
+                });
+            });
+        });
+    </script>
+</body>
+</html> 
