@@ -221,11 +221,13 @@
             </div>
             
             <!-- 诊断内容 -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- 左侧：输入病情 -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- 左侧：患者病情描述 -->
                 <div class="lg:col-span-1">
                     <div class="diagnosis-card p-4 mb-6">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4">患者病情描述</h3>
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-semibold text-gray-800">患者病情描述</h3>
+                        </div>
                         
                         <div class="form-group">
                             <label class="form-label" for="symptoms">主诉症状</label>
@@ -285,8 +287,8 @@
                     </div>
                 </div>
                 
-                <!-- 右侧：AI诊断结果 -->
-                <div class="lg:col-span-2">
+                <!-- 右侧：诊断结果报告WEB插件 -->
+                <div class="lg:col-span-1">
                     <div class="diagnosis-card p-4 mb-6">
                         <div class="flex justify-between items-center mb-4">
                             <h3 class="text-lg font-semibold text-gray-800">AI诊断分析</h3>
@@ -299,7 +301,7 @@
                             </div>
                         </div>
                         
-                        <!-- AI与医生的交互 -->
+                        <!-- AI诊断对话框 -->
                         <div class="mb-6">
                             <div class="flex items-start mb-4">
                                 <div class="flex-shrink-0 w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
@@ -354,10 +356,12 @@
                     
                     <!-- 诊断结果卡片 -->
                     <div class="diagnosis-card p-6">
-                        <h3 class="text-xl font-semibold text-gray-800 mb-6 flex items-center">
-                            <i class="fas fa-clipboard-check text-blue-600 mr-2"></i>
-                            诊断结果报告
-                        </h3>
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-xl font-semibold text-gray-800 flex items-center">
+                                <i class="fas fa-clipboard-check text-blue-600 mr-2"></i>
+                                诊断结果报告
+                            </h3>
+                        </div>
                         
                         <!-- 症状分析 -->
                         <div class="diagnosis-section mb-6">
@@ -381,13 +385,6 @@
                                             <span>受凉后起病，无发热等全身症状</span>
                                         </div>
                                     </li>
-                                    <li class="flex">
-                                        <span class="font-medium mr-2">3.</span>
-                                        <div>
-                                            <span class="font-medium">基础疾病：</span>
-                                            <span>COPD【慢性阻塞性肺病】病史2月规律使用布地奈德福莫特罗吸入剂</span>
-                                        </div>
-                                    </li>
                                 </ul>
                             </div>
                         </div>
@@ -408,59 +405,6 @@
                             </div>
                         </div>
                         
-                        <!-- 危险信号评估 -->
-                        <div class="diagnosis-section mb-6">
-                            <h4 class="diagnosis-section-title">
-                                <i class="fas fa-exclamation-triangle text-yellow-600"></i>
-                                危险信号评估（需立即就医的情况）
-                            </h4>
-                            <div class="bg-red-50 p-4 rounded-lg">
-                                <ul class="space-y-2">
-                                    <li class="flex">
-                                        <i class="fas fa-exclamation-circle text-red-600 mr-2 mt-0.5"></i>
-                                        <span>气短加重或出现呼吸困难</span>
-                                    </li>
-                                    <li class="flex">
-                                        <i class="fas fa-exclamation-circle text-red-600 mr-2 mt-0.5"></i>
-                                        <span>发热超过38.5℃</span>
-                                    </li>
-                                    <li class="flex">
-                                        <i class="fas fa-exclamation-circle text-red-600 mr-2 mt-0.5"></i>
-                                        <span>痰量明显增多或出现脓痰、血痰</span>
-                                    </li>
-                                    <li class="flex">
-                                        <i class="fas fa-exclamation-circle text-red-600 mr-2 mt-0.5"></i>
-                                        <span>意识改变或血氧饱和度下降</span>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                        
-                        <!-- 建议检查 -->
-                        <div class="diagnosis-section mb-6">
-                            <h4 class="diagnosis-section-title">
-                                <i class="fas fa-microscope"></i>
-                                建议检查
-                            </h4>
-                            <div class="bg-gray-50 p-4 rounded-lg">
-                                <div class="mb-3">
-                                    <h5 class="font-medium mb-2">必须检查：</h5>
-                                    <ul class="space-y-1 pl-5 list-disc">
-                                        <li>血常规+C反应蛋白</li>
-                                        <li>胸部X线【排除肺炎】</li>
-                                        <li>指脉氧饱和度监测</li>
-                                    </ul>
-                                </div>
-                                <div>
-                                    <h5 class="font-medium mb-2">可选检查（视病情需要）：</h5>
-                                    <ul class="space-y-1 pl-5 list-disc">
-                                        <li>肺功能检查【评估COPD控制情况】</li>
-                                        <li>痰培养（如怀疑细菌感染）</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                        
                         <!-- 诊疗建议 -->
                         <div class="diagnosis-section">
                             <h4 class="diagnosis-section-title">
@@ -469,42 +413,13 @@
                             </h4>
                             <div class="bg-gray-50 p-4 rounded-lg">
                                 <div class="mb-4">
-                                    <h5 class="font-medium mb-2">一般处理：</h5>
                                     <ul class="space-y-1 pl-5 list-disc">
-                                        <li>适当增加水分摄入</li>
-                                        <li>保持室内空气流通</li>
-                                        <li>继续规律使用布地奈德福莫特罗吸入剂</li>
+                                        <li>继续规律使用布地奈德福莫特罗吸入剂，不要停药</li>
+                                        <li>可添加祛痰药物如氨溴索，帮助稀释痰液</li>
+                                        <li>对于咽干咽痛症状，可使用含片缓解不适</li>
+                                        <li>避免使用镇咳药物，以免抑制咳嗽反射并导致痰液潴留</li>
+                                        <li>保持室内空气湿润，适当增加水分摄入</li>
                                     </ul>
-                                </div>
-                                
-                                <div class="mb-4">
-                                    <h5 class="font-medium mb-2">对症治疗：</h5>
-                                    <ul class="space-y-1 pl-5 list-disc">
-                                        <li>可考虑使用祛痰药物（如氨溴索）</li>
-                                        <li>咽痛可使用含片缓解症状</li>
-                                        <li>不推荐常规使用抗生素（除非有细菌感染证据）</li>
-                                    </ul>
-                                </div>
-                                
-                                <div class="mb-4">
-                                    <h5 class="font-medium mb-2">随访建议：</h5>
-                                    <ul class="space-y-1 pl-5 list-disc">
-                                        <li>如症状持续超过7天无改善或加重需复诊</li>
-                                        <li>如出现上述危险信号，需立即就医</li>
-                                    </ul>
-                                </div>
-                                
-                                <div class="mb-4">
-                                    <h5 class="font-medium mb-2">就医建议：</h5>
-                                    <ul class="space-y-1 pl-5 list-disc">
-                                        <li>建议尽快于呼吸内科门诊就诊</li>
-                                        <li>就诊时请携带既往COPD诊断资料和用药记录</li>
-                                    </ul>
-                                </div>
-                                
-                                <div class="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-sm">
-                                    <p class="font-medium text-yellow-800">注意事项：</p>
-                                    <p class="text-yellow-700">由于患者有COPD基础疾病，即使症状看似轻微，也需警惕COPD急性加重的可能。建议密切观察病情变化。当前建议不能替代实际面诊，如有任何病情变化请及时就医。</p>
                                 </div>
                             </div>
                         </div>
